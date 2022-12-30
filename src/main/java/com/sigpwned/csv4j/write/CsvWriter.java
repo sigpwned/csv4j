@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.Writer;
 import com.sigpwned.csv4j.CsvFormat;
 import com.sigpwned.csv4j.CsvRecord;
+import com.sigpwned.csv4j.util.CsvFormats;
 
 /**
  * Writes well-formatted records to a character stream in CSV format
@@ -31,6 +32,10 @@ import com.sigpwned.csv4j.CsvRecord;
 public class CsvWriter implements AutoCloseable {
   private final CsvFormatter formatter;
   private final Writer out;
+
+  public CsvWriter(Writer out) {
+    this(CsvFormats.CSV, out);
+  }
 
   public CsvWriter(CsvFormat format, Writer out) {
     this(new CsvFormatter(format), out);
@@ -41,8 +46,11 @@ public class CsvWriter implements AutoCloseable {
     this.out = requireNonNull(out);
   }
 
-  public void writeRecord(CsvRecord record) throws IOException {
-    getOut().write(getFormatter().formatRecord(record));
+  /**
+   * Write the given record to this writer's CSV data
+   */
+  public void writeNext(CsvRecord next) throws IOException {
+    getOut().write(getFormatter().formatRecord(next));
     getOut().write('\n');
   }
 

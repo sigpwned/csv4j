@@ -19,6 +19,7 @@
  */
 package com.sigpwned.csv4j;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +28,10 @@ import java.util.Objects;
  * One row of a CSV file
  */
 public class CsvRecord {
+  public static CsvRecord of(CsvField... fields) {
+    return new CsvRecord(asList(fields));
+  }
+
   public static CsvRecord of(List<CsvField> fields) {
     return new CsvRecord(fields);
   }

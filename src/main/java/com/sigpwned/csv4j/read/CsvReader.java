@@ -23,8 +23,15 @@ import static java.util.Objects.requireNonNull;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.io.Reader;
+import java.io.UncheckedIOException;
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import com.sigpwned.csv4j.CsvFormat;
 import com.sigpwned.csv4j.CsvRecord;
+import com.sigpwned.csv4j.util.CsvFormats;
 
 /**
  * Reads well-formatted records from character stream in CSV format
@@ -34,6 +41,10 @@ public class CsvReader implements AutoCloseable {
 
   private final CsvParser parser;
   private final PushbackReader in;
+
+  public CsvReader(Reader in) {
+    this(CsvFormats.CSV, in);
+  }
 
   public CsvReader(CsvFormat format, Reader in) {
     this(format, new PushbackReader(in, MIN_PUSHBACK));
@@ -48,7 +59,10 @@ public class CsvReader implements AutoCloseable {
     this.parser = requireNonNull(parser);
   }
 
-  public CsvRecord readRecord() throws IOException {
+  /**
+   * @return The next record in this reader's CSV data if it exists, or {@code null} otherwise.
+   */
+  public CsvRecord readNext() throws IOException {
     CsvRecord result;
     if (peek1(getIn()) == -1) {
       result = null;
@@ -56,6 +70,47 @@ public class CsvReader implements AutoCloseable {
       result = getParser().parseRecord(in);
     }
     return result;
+  }
+
+  /**
+   * @return An {@link Iterator} for each remaining row this reader's CSV data.
+   * @throws UncheckedIOException in case of {@link IOException}
+   */
+  public Iterator<CsvRecord> iterator() {
+    final CsvRecord first;
+    try {
+      first = readNext();
+    } catch (IOException e) {
+      throw new UncheckedIOException("Failed to read initial row", e);
+    }
+    return new Iterator<CsvRecord>() {
+      private CsvRecord next = first;
+
+      @Override
+      public boolean hasNext() {
+        return next != null;
+      }
+
+      @Override
+      public CsvRecord next() {
+        CsvRecord result = next;
+        try {
+          next = readNext();
+        } catch (IOException e) {
+          throw new UncheckedIOException("Failed to read next row", e);
+        }
+        return result;
+      }
+    };
+  }
+
+  /**
+   * @return A {@link Stream} of the remaining rows in this reader's CSV data.
+   * @throws UncheckedIOException in case of {@link IOException}
+   */
+  public Stream<CsvRecord> stream() {
+    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator(),
+        Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED), false);
   }
 
   public CsvFormat getFormat() {

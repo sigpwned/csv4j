@@ -46,7 +46,7 @@ public class CsvTest {
 
     try (final CsvWriter w = new CsvWriter(CsvFormats.CSV, wbuf)) {
       for (CsvRecord e : expecteds)
-        w.writeRecord(e);
+        w.writeNext(e);
     }
 
     final StringReader rbuf = new StringReader(wbuf.toString());
@@ -54,7 +54,7 @@ public class CsvTest {
     final List<CsvRecord> observeds = new ArrayList<>();
 
     try (final CsvReader r = new CsvReader(CsvFormats.CSV, rbuf)) {
-      for (CsvRecord o = r.readRecord(); o != null; o = r.readRecord())
+      for (CsvRecord o = r.readNext(); o != null; o = r.readNext())
         observeds.add(o);
     }
 
