@@ -126,17 +126,47 @@ public class CsvReader implements AutoCloseable, Iterable<CsvRecord> {
     getIn().close();
   }
 
-  private Optional<CsvRecord> next;
+  /**
+   * Basically an {@link Optional}. Used to avoid warnings source analysis warnings.
+   */
+  private static class OptionalRecord {
+    private static final OptionalRecord EMPTY = new OptionalRecord(null);
+
+    public static OptionalRecord empty() {
+      return EMPTY;
+    }
+
+    public static OptionalRecord ofNullable(CsvRecord value) {
+      return value != null ? new OptionalRecord(value) : EMPTY;
+    }
+
+    public final CsvRecord value;
+
+
+    public CsvRecord orElseNull() {
+      return value != null ? value : null;
+    }
+
+    private OptionalRecord(CsvRecord value) {
+      this.value = value;
+    }
+  }
+
+  /**
+   * If this value is {@code null}, then the next record is unknown. Otherwise, the next record (or
+   * its absence) is contained in this value.
+   */
+  private OptionalRecord next;
 
   private CsvRecord peek() throws IOException {
     if (next == null) {
       if (peek1(getIn()) == -1) {
-        next = Optional.empty();
+        next = OptionalRecord.empty();
       } else {
-        next = Optional.ofNullable(getParser().parseRecord(in));
+        next = OptionalRecord.ofNullable(getParser().parseRecord(in));
       }
     }
-    return next.orElse(null);
+    return next.orElseNull();
   }
 
   private CsvRecord next() throws IOException {
