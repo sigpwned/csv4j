@@ -19,6 +19,7 @@
  */
 package com.sigpwned.csv4j;
 
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.IOException;
@@ -148,7 +149,7 @@ public class CsvTest {
 
     final List<CsvRecord> observeds;
     try (final CsvReader r = new CsvReader(CsvFormats.CSV, rbuf)) {
-      observeds = r.stream().toList();
+      observeds = r.stream().collect(toList());
     }
 
     assertThat(observeds, is(expecteds));
