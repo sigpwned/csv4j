@@ -25,6 +25,8 @@ import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
@@ -34,9 +36,12 @@ import com.sigpwned.csv4j.CsvRecord;
 import com.sigpwned.csv4j.util.CsvFormats;
 
 /**
- * Reads well-formatted records from character stream in CSV format
+ * Reads well-formatted records from character stream in CSV format. This object is not thread-safe.
+ * The user may interleave calls to {@link #readNext()}, {@link #iterator()} and its return values,
+ * {@link #spliterator()} and its return values, and {@link #stream()} and its return values, and
+ * the results will remain consistent.
  */
-public class CsvReader implements AutoCloseable {
+public class CsvReader implements AutoCloseable, Iterable<CsvRecord> {
   public static final int MIN_PUSHBACK = 1;
 
   private final CsvParser parser;
@@ -63,13 +68,7 @@ public class CsvReader implements AutoCloseable {
    * @return The next record in this reader's CSV data if it exists, or {@code null} otherwise.
    */
   public CsvRecord readNext() throws IOException {
-    CsvRecord result;
-    if (peek1(getIn()) == -1) {
-      result = null;
-    } else {
-      result = getParser().parseRecord(in);
-    }
-    return result;
+    return next();
   }
 
   /**
@@ -77,31 +76,37 @@ public class CsvReader implements AutoCloseable {
    * @throws UncheckedIOException in case of {@link IOException}
    */
   public Iterator<CsvRecord> iterator() {
-    final CsvRecord first;
-    try {
-      first = readNext();
-    } catch (IOException e) {
-      throw new UncheckedIOException("Failed to read initial row", e);
-    }
     return new Iterator<CsvRecord>() {
-      private CsvRecord next = first;
-
       @Override
       public boolean hasNext() {
-        return next != null;
+        CsvRecord peeked;
+        try {
+          peeked = CsvReader.this.peek();
+        } catch (IOException e) {
+          throw new UncheckedIOException("Failed to peek next row", e);
+        }
+        return peeked != null;
       }
 
       @Override
       public CsvRecord next() {
-        CsvRecord result = next;
+        CsvRecord result;
         try {
-          next = readNext();
+          result = CsvReader.this.next();
         } catch (IOException e) {
           throw new UncheckedIOException("Failed to read next row", e);
         }
+        if (result == null)
+          throw new NoSuchElementException();
         return result;
       }
     };
+  }
+
+  @Override
+  public Spliterator<CsvRecord> spliterator() {
+    return Spliterators.spliteratorUnknownSize(iterator(),
+        Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED);
   }
 
   /**
@@ -109,8 +114,7 @@ public class CsvReader implements AutoCloseable {
    * @throws UncheckedIOException in case of {@link IOException}
    */
   public Stream<CsvRecord> stream() {
-    return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator(),
-        Spliterator.IMMUTABLE | Spliterator.NONNULL | Spliterator.ORDERED), false);
+    return StreamSupport.stream(spliterator(), false);
   }
 
   public CsvFormat getFormat() {
@@ -120,6 +124,25 @@ public class CsvReader implements AutoCloseable {
   @Override
   public void close() throws IOException {
     getIn().close();
+  }
+
+  private Optional<CsvRecord> next;
+
+  private CsvRecord peek() throws IOException {
+    if (next == null) {
+      if (peek1(getIn()) == -1) {
+        next = Optional.empty();
+      } else {
+        next = Optional.ofNullable(getParser().parseRecord(in));
+      }
+    }
+    return next.orElse(null);
+  }
+
+  private CsvRecord next() throws IOException {
+    CsvRecord result = peek();
+    next = null;
+    return result;
   }
 
   /**

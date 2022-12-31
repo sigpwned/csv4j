@@ -107,4 +107,50 @@ public class CsvTest {
 
     assertThat(wbuf.toString(), is(expected));
   }
+
+  @Test
+  public void iteratorTest() throws IOException {
+    final List<CsvRecord> expecteds = List.of(
+        CsvRecord.of(List.of(CsvField.of(true, "alpha"), CsvField.of(true, "bravo"),
+            CsvField.of(true, "charlie"))),
+        CsvRecord.of(
+            List.of(CsvField.of(true, "hello"), CsvField.of(true, "10"), CsvField.of(true, "5"))),
+        CsvRecord.of(
+            List.of(CsvField.of(true, "world"), CsvField.of(true, ""), CsvField.of(false, ""))));
+
+    // TODO Use text blocks when update to Java 17
+    final StringReader rbuf = new StringReader(
+        "\"alpha\",\"bravo\",\"charlie\"\n" + "\"hello\",\"10\",\"5\"\n" + "\"world\",\"\",\n");
+
+    final List<CsvRecord> observeds = new ArrayList<>();
+
+    try (final CsvReader r = new CsvReader(CsvFormats.CSV, rbuf)) {
+      for (CsvRecord o : r)
+        observeds.add(o);
+    }
+
+    assertThat(observeds, is(expecteds));
+  }
+
+  @Test
+  public void streamTest() throws IOException {
+    final List<CsvRecord> expecteds = List.of(
+        CsvRecord.of(List.of(CsvField.of(true, "alpha"), CsvField.of(true, "bravo"),
+            CsvField.of(true, "charlie"))),
+        CsvRecord.of(
+            List.of(CsvField.of(true, "hello"), CsvField.of(true, "10"), CsvField.of(true, "5"))),
+        CsvRecord.of(
+            List.of(CsvField.of(true, "world"), CsvField.of(true, ""), CsvField.of(false, ""))));
+
+    // TODO Use text blocks when update to Java 17
+    final StringReader rbuf = new StringReader(
+        "\"alpha\",\"bravo\",\"charlie\"\n" + "\"hello\",\"10\",\"5\"\n" + "\"world\",\"\",\n");
+
+    final List<CsvRecord> observeds;
+    try (final CsvReader r = new CsvReader(CsvFormats.CSV, rbuf)) {
+      observeds = r.stream().toList();
+    }
+
+    assertThat(observeds, is(expecteds));
+  }
 }
