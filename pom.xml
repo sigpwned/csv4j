@@ -3,7 +3,7 @@
 
     <groupId>com.sigpwned</groupId>
     <artifactId>csv4j</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>csv4j</name>
     <inceptionYear>2022</inceptionYear>
     <description>CSV reading and writing for Java 8+</description>
@@ -19,7 +19,7 @@
         <connection>scm:git:ssh://git@github.com/sigpwned/csv4j.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/sigpwned/csv4j.git</developerConnection>
         <url>https://github.com/sigpwned/csv4j/tree/main</url>
-      <tag>HEAD</tag>
+      <tag>v0.0.1</tag>
   </scm>
 
     <licenses>
