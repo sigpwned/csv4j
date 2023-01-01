@@ -17,7 +17,19 @@ CSV4J is a simple CSV reader and writer for Java 8 or later.
 
 There are already many good libraries with CSV support available: [Apache Commons CSV](https://commons.apache.org/proper/commons-csv/), [Super CSV](http://super-csv.github.io/super-csv/), [Opencsv](https://opencsv.sourceforge.net/), [Jackson](https://github.com/FasterXML/jackson-dataformats-text/tree/master/csv), etc. So why publish another?
 
-In my experience, most of these libraries either (a) have long-standing bugs, (b) are complex to use, (c) do too much, or (d) do not give visibility into low-level encoding data, particularly whether individual fields are quoted. This library is intended to be (a) correct, (b) simple, (c) focused, and (d) provide perfect visibility into low-level encoding.
+In my experience, most of these libraries either:
+
+1. Have long-standing bugs
+2. Are complex to use
+3. Do too much
+4. Do not give visibility into low-level encoding data, particularly whether individual fields are quoted
+
+In response, this library is designed to be:
+
+1. Correct
+2. Simple
+3. Focused
+4. Transparent
 
 ## Code Examples
 
