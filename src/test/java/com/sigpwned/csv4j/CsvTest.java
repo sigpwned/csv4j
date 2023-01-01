@@ -38,12 +38,12 @@ public class CsvTest {
     final StringWriter wbuf = new StringWriter();
 
     final List<CsvRecord> expecteds = List.of(
-        CsvRecord.of(List.of(CsvField.of(true, "alpha"), CsvField.of(true, "bravo"),
-            CsvField.of(true, "charlie"))),
+        CsvRecord.of(List.of(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
+            new CsvField(true, "charlie"))),
+        CsvRecord.of(List.of(new CsvField(true, "hello"), new CsvField(true, "10"),
+            new CsvField(true, "5"))),
         CsvRecord.of(
-            List.of(CsvField.of(true, "hello"), CsvField.of(true, "10"), CsvField.of(true, "5"))),
-        CsvRecord.of(
-            List.of(CsvField.of(true, "world"), CsvField.of(true, ""), CsvField.of(false, ""))));
+            List.of(new CsvField(true, "world"), new CsvField(true, ""), new CsvField(false, ""))));
 
     try (final CsvWriter w = new CsvWriter(CsvFormats.CSV, wbuf)) {
       for (CsvRecord e : expecteds)
@@ -65,12 +65,12 @@ public class CsvTest {
   @Test
   public void readTest() throws IOException {
     final List<CsvRecord> expecteds = List.of(
-        CsvRecord.of(List.of(CsvField.of(true, "alpha"), CsvField.of(true, "bravo"),
-            CsvField.of(true, "charlie"))),
+        CsvRecord.of(List.of(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
+            new CsvField(true, "charlie"))),
+        CsvRecord.of(List.of(new CsvField(true, "hello"), new CsvField(true, "10"),
+            new CsvField(true, "5"))),
         CsvRecord.of(
-            List.of(CsvField.of(true, "hello"), CsvField.of(true, "10"), CsvField.of(true, "5"))),
-        CsvRecord.of(
-            List.of(CsvField.of(true, "world"), CsvField.of(true, ""), CsvField.of(false, ""))));
+            List.of(new CsvField(true, "world"), new CsvField(true, ""), new CsvField(false, ""))));
 
     // TODO Use text blocks when update to Java 17
     final StringReader rbuf = new StringReader(
@@ -89,12 +89,12 @@ public class CsvTest {
   @Test
   public void writeTest() throws IOException {
     final List<CsvRecord> records = List.of(
-        CsvRecord.of(List.of(CsvField.of(true, "alpha"), CsvField.of(true, "bravo"),
-            CsvField.of(true, "charlie"))),
+        CsvRecord.of(List.of(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
+            new CsvField(true, "charlie"))),
+        CsvRecord.of(List.of(new CsvField(true, "hello"), new CsvField(true, "10"),
+            new CsvField(true, "5"))),
         CsvRecord.of(
-            List.of(CsvField.of(true, "hello"), CsvField.of(true, "10"), CsvField.of(true, "5"))),
-        CsvRecord.of(
-            List.of(CsvField.of(true, "world"), CsvField.of(true, ""), CsvField.of(false, ""))));
+            List.of(new CsvField(true, "world"), new CsvField(true, ""), new CsvField(false, ""))));
 
     final StringWriter wbuf = new StringWriter();
     try (final CsvWriter w = new CsvWriter(CsvFormats.CSV, wbuf)) {
@@ -112,12 +112,12 @@ public class CsvTest {
   @Test
   public void iteratorTest() throws IOException {
     final List<CsvRecord> expecteds = List.of(
-        CsvRecord.of(List.of(CsvField.of(true, "alpha"), CsvField.of(true, "bravo"),
-            CsvField.of(true, "charlie"))),
+        CsvRecord.of(List.of(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
+            new CsvField(true, "charlie"))),
+        CsvRecord.of(List.of(new CsvField(true, "hello"), new CsvField(true, "10"),
+            new CsvField(true, "5"))),
         CsvRecord.of(
-            List.of(CsvField.of(true, "hello"), CsvField.of(true, "10"), CsvField.of(true, "5"))),
-        CsvRecord.of(
-            List.of(CsvField.of(true, "world"), CsvField.of(true, ""), CsvField.of(false, ""))));
+            List.of(new CsvField(true, "world"), new CsvField(true, ""), new CsvField(false, ""))));
 
     // TODO Use text blocks when update to Java 17
     final StringReader rbuf = new StringReader(
@@ -136,12 +136,12 @@ public class CsvTest {
   @Test
   public void streamTest() throws IOException {
     final List<CsvRecord> expecteds = List.of(
-        CsvRecord.of(List.of(CsvField.of(true, "alpha"), CsvField.of(true, "bravo"),
-            CsvField.of(true, "charlie"))),
+        CsvRecord.of(List.of(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
+            new CsvField(true, "charlie"))),
+        CsvRecord.of(List.of(new CsvField(true, "hello"), new CsvField(true, "10"),
+            new CsvField(true, "5"))),
         CsvRecord.of(
-            List.of(CsvField.of(true, "hello"), CsvField.of(true, "10"), CsvField.of(true, "5"))),
-        CsvRecord.of(
-            List.of(CsvField.of(true, "world"), CsvField.of(true, ""), CsvField.of(false, ""))));
+            List.of(new CsvField(true, "world"), new CsvField(true, ""), new CsvField(false, ""))));
 
     // TODO Use text blocks when update to Java 17
     final StringReader rbuf = new StringReader(

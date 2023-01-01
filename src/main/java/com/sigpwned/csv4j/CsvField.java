@@ -25,18 +25,16 @@ import java.util.Objects;
  * One cell of a row in a CSV file
  */
 public class CsvField {
-  public static CsvField of(boolean quoted, String text) {
-    return new CsvField(quoted, text);
+  private boolean quoted;
+  private String text;
+
+  public CsvField() {
+    this(false, "");
   }
 
-  private final boolean quoted;
-  private final String text;
-
   public CsvField(boolean quoted, String text) {
-    if (text == null)
-      throw new NullPointerException();
-    this.quoted = quoted;
-    this.text = text;
+    setQuoted(quoted);
+    setText(text);
   }
 
   /**
@@ -47,10 +45,36 @@ public class CsvField {
   }
 
   /**
+   * @param quoted the quoted to set
+   */
+  public void setQuoted(boolean quoted) {
+    this.quoted = quoted;
+  }
+
+  public CsvField withQuoted(boolean quoted) {
+    setQuoted(quoted);
+    return this;
+  }
+
+  /**
    * @return the text
    */
   public String getText() {
     return text;
+  }
+
+  /**
+   * @param text the text to set
+   */
+  public void setText(String text) {
+    if (text == null)
+      throw new NullPointerException();
+    this.text = text;
+  }
+
+  public CsvField withText(String text) {
+    setText(text);
+    return this;
   }
 
   @Override

@@ -80,7 +80,7 @@ public class CsvParser {
       }
     }
 
-    return CsvField.of(quoted, result.toString());
+    return new CsvField(quoted, result.toString());
   }
 
   private int peek1(PushbackReader r) throws IOException {
