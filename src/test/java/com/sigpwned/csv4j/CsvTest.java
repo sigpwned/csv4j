@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 import com.sigpwned.csv4j.read.CsvReader;
@@ -37,13 +38,13 @@ public class CsvTest {
   public void smokeTest() throws IOException {
     final StringWriter wbuf = new StringWriter();
 
-    final List<CsvRecord> expecteds = List.of(
-        CsvRecord.of(List.of(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
+    final List<CsvRecord> expecteds = Arrays.asList(
+        CsvRecord.of(Arrays.asList(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
             new CsvField(true, "charlie"))),
-        CsvRecord.of(List.of(new CsvField(true, "hello"), new CsvField(true, "10"),
+        CsvRecord.of(Arrays.asList(new CsvField(true, "hello"), new CsvField(true, "10"),
             new CsvField(true, "5"))),
-        CsvRecord.of(
-            List.of(new CsvField(true, "world"), new CsvField(true, ""), new CsvField(false, ""))));
+        CsvRecord.of(Arrays.asList(new CsvField(true, "world"), new CsvField(true, ""),
+            new CsvField(false, ""))));
 
     try (final CsvWriter w = new CsvWriter(CsvFormats.CSV, wbuf)) {
       for (CsvRecord e : expecteds)
@@ -64,13 +65,13 @@ public class CsvTest {
 
   @Test
   public void readTest() throws IOException {
-    final List<CsvRecord> expecteds = List.of(
-        CsvRecord.of(List.of(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
+    final List<CsvRecord> expecteds = Arrays.asList(
+        CsvRecord.of(Arrays.asList(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
             new CsvField(true, "charlie"))),
-        CsvRecord.of(List.of(new CsvField(true, "hello"), new CsvField(true, "10"),
+        CsvRecord.of(Arrays.asList(new CsvField(true, "hello"), new CsvField(true, "10"),
             new CsvField(true, "5"))),
-        CsvRecord.of(
-            List.of(new CsvField(true, "world"), new CsvField(true, ""), new CsvField(false, ""))));
+        CsvRecord.of(Arrays.asList(new CsvField(true, "world"), new CsvField(true, ""),
+            new CsvField(false, ""))));
 
     // TODO Use text blocks when update to Java 17
     final StringReader rbuf = new StringReader(
@@ -88,13 +89,13 @@ public class CsvTest {
 
   @Test
   public void writeTest() throws IOException {
-    final List<CsvRecord> records = List.of(
-        CsvRecord.of(List.of(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
+    final List<CsvRecord> records = Arrays.asList(
+        CsvRecord.of(Arrays.asList(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
             new CsvField(true, "charlie"))),
-        CsvRecord.of(List.of(new CsvField(true, "hello"), new CsvField(true, "10"),
+        CsvRecord.of(Arrays.asList(new CsvField(true, "hello"), new CsvField(true, "10"),
             new CsvField(true, "5"))),
-        CsvRecord.of(
-            List.of(new CsvField(true, "world"), new CsvField(true, ""), new CsvField(false, ""))));
+        CsvRecord.of(Arrays.asList(new CsvField(true, "world"), new CsvField(true, ""),
+            new CsvField(false, ""))));
 
     final StringWriter wbuf = new StringWriter();
     try (final CsvWriter w = new CsvWriter(CsvFormats.CSV, wbuf)) {
@@ -111,13 +112,13 @@ public class CsvTest {
 
   @Test
   public void iteratorTest() throws IOException {
-    final List<CsvRecord> expecteds = List.of(
-        CsvRecord.of(List.of(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
+    final List<CsvRecord> expecteds = Arrays.asList(
+        CsvRecord.of(Arrays.asList(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
             new CsvField(true, "charlie"))),
-        CsvRecord.of(List.of(new CsvField(true, "hello"), new CsvField(true, "10"),
+        CsvRecord.of(Arrays.asList(new CsvField(true, "hello"), new CsvField(true, "10"),
             new CsvField(true, "5"))),
-        CsvRecord.of(
-            List.of(new CsvField(true, "world"), new CsvField(true, ""), new CsvField(false, ""))));
+        CsvRecord.of(Arrays.asList(new CsvField(true, "world"), new CsvField(true, ""),
+            new CsvField(false, ""))));
 
     // TODO Use text blocks when update to Java 17
     final StringReader rbuf = new StringReader(
@@ -135,13 +136,13 @@ public class CsvTest {
 
   @Test
   public void streamTest() throws IOException {
-    final List<CsvRecord> expecteds = List.of(
-        CsvRecord.of(List.of(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
+    final List<CsvRecord> expecteds = Arrays.asList(
+        CsvRecord.of(Arrays.asList(new CsvField(true, "alpha"), new CsvField(true, "bravo"),
             new CsvField(true, "charlie"))),
-        CsvRecord.of(List.of(new CsvField(true, "hello"), new CsvField(true, "10"),
+        CsvRecord.of(Arrays.asList(new CsvField(true, "hello"), new CsvField(true, "10"),
             new CsvField(true, "5"))),
-        CsvRecord.of(
-            List.of(new CsvField(true, "world"), new CsvField(true, ""), new CsvField(false, ""))));
+        CsvRecord.of(Arrays.asList(new CsvField(true, "world"), new CsvField(true, ""),
+            new CsvField(false, ""))));
 
     // TODO Use text blocks when update to Java 17
     final StringReader rbuf = new StringReader(
