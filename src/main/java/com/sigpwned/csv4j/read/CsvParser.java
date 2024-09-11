@@ -20,7 +20,6 @@
 package com.sigpwned.csv4j.read;
 
 import static java.util.Objects.requireNonNull;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.PushbackReader;
 import java.util.ArrayList;
@@ -54,8 +53,10 @@ public class CsvParser {
   }
 
   private CsvField parseField(PushbackReader in) throws IOException {
-    if (attempt(in, -1))
-      throw new EOFException();
+    if (attempt(in, -1)) {
+      // The very last field on the very last line is empty and unquoted.
+      return new CsvField(false, "");
+    }
 
     boolean quoted;
     StringBuilder result = new StringBuilder();
