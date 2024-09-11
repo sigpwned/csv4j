@@ -23,6 +23,7 @@ In my experience, most of these libraries either:
 2. Are complex to use
 3. Do too much
 4. Do not give visibility into low-level encoding data, particularly whether individual fields are quoted
+5. Do not handle [byte order marks](https://en.wikipedia.org/wiki/Byte_order_mark) (BOMs)
 
 In response, this library is designed to be:
 
@@ -30,12 +31,21 @@ In response, this library is designed to be:
 2. Simple
 3. Focused
 4. Transparent
+5. BOM-aware
 
 ## Code Examples
 
 To read data in the standard CSV format, use:
 
     try (CsvReader rows=new CsvReader(openReader())) {
+        for(CsvRecord row=rows.readNext();row!=null;row=rows.readNext()) {
+            // Do something here
+        }
+    }
+
+To read data in the standard CSV format while respecting BOMs -- for example, to read CSV files exported from Excel -- use:
+
+    try (CsvReader rows=new CsvReader(Boms.decodeFromBom(openInputStream(), StandardCharsets.UTF_8))) {
         for(CsvRecord row=rows.readNext();row!=null;row=rows.readNext()) {
             // Do something here
         }
@@ -72,8 +82,12 @@ The `CsvReader` also has a `stream` capability:
 
 The csv4j library has no dependencies. However, these libraries may be useful when processing CSV data.
 
+### chardet4j
+
 Users may find [chardet4j](https://github.com/sigpwned/chardet4j) useful for decoding byte streams into character streams when character encodings are not known ahead of time, for example with user input:
 
     try (CsvReader rows=new CsvReader(Chardet.decode(openInputStream(), StandardCharsets.UTF_8))) {
         // Process rows here like normal...
     }
+    
+This code considers BOMs and performs a much smarter, more thorough byte frequency analysis to detect charsets.
