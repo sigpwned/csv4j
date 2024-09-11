@@ -25,11 +25,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 import com.sigpwned.csv4j.read.CsvReader;
+import com.sigpwned.csv4j.util.Boms;
 import com.sigpwned.csv4j.util.CsvFormats;
 import com.sigpwned.csv4j.write.CsvWriter;
 
@@ -154,5 +157,40 @@ public class CsvTest {
     }
 
     assertThat(observeds, is(expecteds));
+  }
+
+  @Test
+  public void excelExportCsvUtf8Test() throws IOException {
+    final URL resource = getClass().getResource("example.csv");
+
+    // Note that we use BOM-aware code here
+    List<CsvRecord> records = new ArrayList<>();
+    try (final CsvReader r = new CsvReader(CsvFormats.CSV,
+        Boms.decodeFromBom(resource.openStream(), StandardCharsets.UTF_8))) {
+      for (CsvRecord record = r.readNext(); record != null; record = r.readNext()) {
+        records.add(record);
+      }
+    }
+
+    assertThat(records,
+        is(Arrays.asList(
+            new CsvRecord(Arrays.asList(new CsvField(false, "hg_external_id"),
+                new CsvField(false, "hg_name_given"), new CsvField(false, "hg_name_family"),
+                new CsvField(false, "hg_name_text"), new CsvField(false, "hg_location_country"),
+                new CsvField(false, "hg_location_state"), new CsvField(false, "hg_location_city"),
+                new CsvField(false, "hg_location_text"))),
+            new CsvRecord(Arrays.asList(new CsvField(false, "060835d0-85dc-411b-9c28-21c88fd59fdc"),
+                new CsvField(false, ""), new CsvField(false, ""),
+                new CsvField(false, "Abraham Lincoln"), new CsvField(false, ""),
+                new CsvField(false, ""), new CsvField(false, ""),
+                new CsvField(true, "Springfield, IL"))),
+            new CsvRecord(Arrays.asList(new CsvField(false, "9b2091fe-1a4c-41d1-8614-56f198644bed"),
+                new CsvField(false, "George"), new CsvField(false, "Washington"),
+                new CsvField(false, ""), new CsvField(false, "US"), new CsvField(false, "Virginia"),
+                new CsvField(false, "Fredericksburg"), new CsvField(false, ""))),
+            new CsvRecord(Arrays.asList(new CsvField(false, "d1fb88a0-302f-49f6-accc-f0704dfc0d93"),
+                new CsvField(false, ""), new CsvField(false, ""), new CsvField(false, ""),
+                new CsvField(false, ""), new CsvField(false, ""), new CsvField(false, ""),
+                new CsvField(false, ""))))));
   }
 }
