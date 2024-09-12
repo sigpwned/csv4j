@@ -21,7 +21,6 @@ package com.sigpwned.csv4j.read;
 
 import static java.util.Objects.requireNonNull;
 import java.io.IOException;
-import java.io.PushbackReader;
 import java.util.ArrayList;
 import java.util.List;
 import com.sigpwned.csv4j.CsvField;
@@ -38,21 +37,32 @@ public class CsvParser {
     this.format = requireNonNull(format);
   }
 
-  public CsvRecord parseRecord(PushbackReader in) throws IOException {
+  public CsvRecord parseRecord(LineCountingCharStream in) throws IOException {
     List<CsvField> result = new ArrayList<>();
+
+    int linenum = in.linenum();
 
     result.add(parseField(in));
     while (attempt(in, getFormat().getColumnSeparatorChar())) {
       result.add(parseField(in));
     }
 
-    while (peek1(in) == '\r' || peek1(in) == '\n')
-      in.read();
+    // We should be at the end of a record here. That means two things: newline, or EOF.
+    if (peek1(in) == -1) {
+      // Groovy. EOF is a fine end to a record.
+    } else if (peek1(in) == '\r' || peek1(in) == '\n') {
+      // Also groovy. Newline is a fine end to a record.
+      do {
+        in.read();
+      } while (peek1(in) == '\r' || peek1(in) == '\n');
+    } else {
+      throw new MalformedRecordException(linenum);
+    }
 
     return CsvRecord.of(result);
   }
 
-  private CsvField parseField(PushbackReader in) throws IOException {
+  private CsvField parseField(LineCountingCharStream in) throws IOException {
     if (attempt(in, -1)) {
       // The very last field on the very last line is empty and unquoted.
       return new CsvField(false, "");
@@ -75,7 +85,7 @@ public class CsvParser {
       quoted = false;
 
       int ch = peek1(in);
-      while (ch != -1 && ch != getFormat().getColumnSeparatorChar() && ch != '\r' && ch != '\n') {
+      while (ch != getFormat().getColumnSeparatorChar() && ch != '\r' && ch != '\n' && ch != -1) {
         result.append((char) (in.read() & 0xFFFF));
         ch = peek1(in);
       }
@@ -84,22 +94,18 @@ public class CsvParser {
     return new CsvField(quoted, result.toString());
   }
 
-  private int peek1(PushbackReader r) throws IOException {
-    int buf = r.read();
-    if (buf != -1)
-      r.unread(buf);
-    return buf;
+  private int peek1(LineCountingCharStream r) throws IOException {
+    return r.peek();
   }
 
-  private boolean attempt(PushbackReader r, int ch) throws IOException {
+  private boolean attempt(LineCountingCharStream r, int ch) throws IOException {
     boolean result;
 
-    int buf = r.read();
+    int buf = r.peek();
     if (buf == ch) {
+      r.read();
       result = true;
     } else {
-      if (buf != -1)
-        r.unread(buf);
       result = false;
     }
 
