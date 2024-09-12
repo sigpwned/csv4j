@@ -45,7 +45,7 @@ public class CsvReader implements AutoCloseable, Iterable<CsvRecord> {
   public static final int MIN_PUSHBACK = 1;
 
   private final CsvParser parser;
-  private final PushbackReader in;
+  private final LineCountingCharStream in;
 
   public CsvReader(Reader in) {
     this(CsvFormats.CSV, in);
@@ -60,7 +60,7 @@ public class CsvReader implements AutoCloseable, Iterable<CsvRecord> {
   }
 
   public CsvReader(CsvParser parser, PushbackReader in) {
-    this.in = requireNonNull(in);
+    this.in = new LineCountingCharStream(requireNonNull(in));
     this.parser = requireNonNull(parser);
   }
 
@@ -160,7 +160,7 @@ public class CsvReader implements AutoCloseable, Iterable<CsvRecord> {
 
   private CsvRecord peek() throws IOException {
     if (next == null) {
-      if (peek1(getIn()) == -1) {
+      if (getIn().peek() == -1) {
         next = OptionalRecord.empty();
       } else {
         next = OptionalRecord.ofNullable(getParser().parseRecord(in));
@@ -185,14 +185,7 @@ public class CsvReader implements AutoCloseable, Iterable<CsvRecord> {
   /**
    * @return the in
    */
-  private PushbackReader getIn() {
+  private LineCountingCharStream getIn() {
     return in;
-  }
-
-  private int peek1(PushbackReader r) throws IOException {
-    int buf = r.read();
-    if (buf != -1)
-      r.unread(buf);
-    return buf;
   }
 }
